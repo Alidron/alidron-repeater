@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Alidron.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 import os
 import struct
 import sys
@@ -25,6 +26,8 @@ from consul import Consul
 from pyre.zbeacon import ZBeacon
 from pyre.zactor import ZActor
 from pyre.pyre_node import ZRE_DISCOVERY_PORT
+
+logger = logging.getLogger(__name__)
 
 DELAY_SYNC_REPEATERS = 1
 
@@ -56,7 +59,7 @@ class ZBeaconRepeater(object):
         self.poller.register(self.beacon_socket, zmq.POLLIN)
 
     def _connect_to_repeaters(self):
-        print '>>>> syncing repeaters'
+        logger.debug('Syncing repeaters')
         docker_nodes = self.consul.kv.get('docker/nodes', recurse=True)
         for node in docker_nodes[1]:
             ip = node['Value'].split(':')[0]
@@ -69,7 +72,7 @@ class ZBeaconRepeater(object):
         if ip in self.other_repeaters:
             return
 
-        print '>>>> Connecting to repeater', ip
+        logger.info('Connecting to repeater %s', ip)
         endpoint = 'tcp://%s:%d' % (ip, 2340)
         self.sub.connect(endpoint)
 
@@ -88,13 +91,13 @@ class ZBeaconRepeater(object):
                     for fd, ev in items.items():
                         if (self.sub == fd) and (ev == zmq.POLLIN):
                             data = self.sub.recv_multipart()
-                            print '>>>> From SUB:', data
+                            logger.debug('From SUB: %s', data)
                             self.beacon.send_unicode('SEND BEACON', zmq.SNDMORE)
                             self.beacon.send(data[0])
 
                         elif (self.beacon_socket == fd) and (ev == zmq.POLLIN):
                             addr, data = self.beacon_socket.recv_multipart()
-                            print '>>>> From UDP:', data + addr
+                            logger.debug('From UDP: %s', data + addr)
                             self.pub.send(data + addr)
 
                     items = dict(self.poller.poll(0))
