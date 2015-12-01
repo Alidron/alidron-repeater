@@ -30,6 +30,7 @@ from pyre.pyre_node import ZRE_DISCOVERY_PORT
 logger = logging.getLogger(__name__)
 
 DELAY_SYNC_REPEATERS = 1
+REPEATER_PUB_PORT = 2340
 
 class ZBeaconRepeater(object):
 
@@ -40,9 +41,10 @@ class ZBeaconRepeater(object):
 
         self.ctx = zmq.Context()
         self.poller = zmq.Poller()
-
+        
+        self.repeater_pub_port = REPEATER_PUB_PORT
         self.pub = self.ctx.socket(zmq.PUB)
-        self.pub.bind('tcp://*:2340')
+        self.pub.bind('tcp://*:%d' % self.repeater_pub_port)
 
         self.sub = self.ctx.socket(zmq.SUB)
         self.sub.setsockopt(zmq.SUBSCRIBE, b'')
@@ -73,7 +75,7 @@ class ZBeaconRepeater(object):
             return
 
         logger.info('Connecting to repeater %s', ip)
-        endpoint = 'tcp://%s:%d' % (ip, 2340)
+        endpoint = 'tcp://%s:%d' % (ip, self.repeater_pub_port)
         self.sub.connect(endpoint)
 
         self.other_repeaters.append(ip)
