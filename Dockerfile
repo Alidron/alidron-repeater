@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Alidron.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM alidron/alidron-base-python:2
+FROM alidron/alidron-base-python:2-slim
 MAINTAINER Axel Voitier <axel.voitier@gmail.com>
 
 RUN pip install python-consul
