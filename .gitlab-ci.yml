@@ -21,7 +21,6 @@ deploy:
     tags:
         - x86
     script:
-        - cd python-openzwave:master
         - make push
         
 deploy-rpi:
