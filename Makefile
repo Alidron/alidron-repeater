@@ -24,7 +24,7 @@ network_name = alidron
 container_name = alidron-repeater
 consul_host = 192.168.1.5
 
-.PHONY: clean clean-dangling build build-rpi push push-rpi pull pull-rpi run run-it run-rpi bash bash-rpi exec-bash stop logs
+.PHONY: clean clean-dangling build build-rpi push push-rpi pull pull-rpi run run-it run-rpi bash bash-rpi exec-bash stop stop-rpi logs logs-rpi
 
 clean:
 	docker rmi $(image_name) || true
@@ -76,8 +76,16 @@ exec-bash:
 	docker exec -it $(container_name) bash
 
 stop:
-	docker stop -t 5 $(container_name)
+	docker stop -t 1 $(container_name)
 	docker rm $(container_name)
+
+stop-rpi:
+	docker stop -t 3 $(container_name)-rpi
+	docker rm $(container_name)-rpi
 
 logs:
 	docker logs -f $(container_name)
+
+logs-rpi:
+	docker logs -f $(container_name)-rpi
+	
