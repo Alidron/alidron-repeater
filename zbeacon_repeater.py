@@ -23,6 +23,8 @@ import time
 import zmq
 from consul import Consul
 
+from isac import patch
+
 from pyre.zbeacon import ZBeacon
 from pyre.zactor import ZActor
 from pyre.pyre_node import ZRE_DISCOVERY_PORT
